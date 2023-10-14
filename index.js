@@ -18,11 +18,28 @@ const startGame = async (chatId) => {
   await bot.sendMessage(chatId, `Please guess...`, gameOption);
 };
 
+const leftMoney = {};
+
+const countMoney = (chatId) => {
+  bot.sendMessage(chatId, `Enter how much did you spend`);
+  setTimeout(async () => {
+    bot.on("text", async (msg) => {
+      leftMoney[chatId] += parseInt(msg.text);
+      await bot.sendMessage(chatId, `asdad `);
+    });
+    await bot.sendMessage(chatId, `You spend: ${leftMoney[chatId]}`);
+    await bot.sendMessage(chatId, leftMoney[chatId]);
+    leftMoney[chatId] = parseInt(msg.message.text);
+  }, 5000);
+};
+
 const start = () => {
   bot.setMyCommands([
     { command: "/start", description: "Welcome message ^-^" },
     { command: "/info", description: "Info about the project #_#" },
     { command: "/game", description: `Guess the number game` },
+    { command: "/count", description: "Input how much do you spend" },
+    { command: "/money", description: "Output how much money left" },
   ]);
 
   bot.on("message", async (msg) => {
@@ -36,7 +53,7 @@ const start = () => {
       );
       return bot.sendMessage(
         chatId,
-        `Welcome my dear ${userName}, are you hear for canteen's menu?`
+        `Welcome my dear ${userName}, are you hear for count your money?`
       );
     }
     if (text === "/info") {
@@ -45,7 +62,21 @@ const start = () => {
     if (text === "/game") {
       return startGame(chatId);
     }
-    return bot.sendMessage(chatId, `I don't undersand you :(`);
+    if (text === "/money") {
+      if (leftMoney < 10000)
+        return bot.sendMessage(
+          chatId,
+          `You are broke, bummer. You have only: ${leftMoney[chatId]}`
+        );
+      else
+        return bot.sendMessage(
+          chatId,
+          `Damn bro, you are rich. You have: ${leftMoney[chatId]}`
+        );
+    }
+    if (text === "/count") {
+      countMoney(chatId);
+    }
   });
 
   bot.on("callback_query", async (msg) => {
